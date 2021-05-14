@@ -1,6 +1,9 @@
+import { GetStaticProps, InferGetStaticPropsType } from "next";
 import * as React from "react";
 import { useQuery } from "react-query";
 import { Loader } from "../components/Loader";
+import nodeFetch from "node-fetch";
+import { notion } from "../notion";
 
 // pages are also blocks
 const pageId = "ebd5ecb1132b49b9add3f5f8013d4bfa";
@@ -25,7 +28,25 @@ const renderBlocks = (data: any) => {
   );
 };
 
-export default function Index() {
+export const getStaticProps: GetStaticProps = async () => {
+  const pageServerData = await notion.pages.retrieve({ page_id: pageId });
+  const blockServerData = await notion.blocks.children.list({
+    block_id: pageId,
+  });
+
+  return {
+    props: {
+      pageServerData,
+      blockServerData,
+    },
+    revalidate: 60000,
+  };
+};
+
+export default function Index({
+  pageServerData,
+  blockServerData,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const { data: pageData, isFetching: pageDateFetching } = useQuery(
     "page",
     () => fetch(`/api/pages/${pageId}`).then((res) => res.json()),
@@ -66,7 +87,11 @@ export default function Index() {
 
           <p>
             "Where's the code?" -{" "}
-            <a target="_blank" rel="noopener noreferrer" href="#here">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/devjmetivier/notion-live-blog"
+            >
               here
             </a>
           </p>
@@ -76,11 +101,12 @@ export default function Index() {
             That's about it ¯\_(ツ)_/¯
           </p>
 
-          <p>
-            "ISR?" - No, but you could! Super easy I might come back and do that
-          </p>
+          <p>"ISR?" - Yup! Every 60s</p>
 
-          <p>"How often does it refetch?" - About every 10s</p>
+          <p>
+            "How often does it refetch?" - About every 10s (you'll see a little
+            spinner in the bottom right)
+          </p>
 
           <p>
             "People are writing naughty things! 😠" -{" "}
@@ -95,8 +121,8 @@ export default function Index() {
           </p>
         </details>
 
-        {pageData && renderPage(pageData)}
-        {blockData && renderBlocks(blockData)}
+        {renderPage(pageData || pageServerData)}
+        {renderBlocks(blockData || blockServerData)}
       </div>
 
       <div
