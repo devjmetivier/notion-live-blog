@@ -19,6 +19,7 @@ const renderBlocks = (data: any) => {
   return (
     <>
       {content.map((block: any) => {
+        if (!block.paragraph) return null;
         if (!block.paragraph.text.length) return null;
 
         return <p>{block.paragraph.text[0].text.content}</p>;
