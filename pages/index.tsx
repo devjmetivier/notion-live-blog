@@ -2,7 +2,6 @@ import { GetStaticProps, InferGetStaticPropsType } from "next";
 import * as React from "react";
 import { useQuery } from "react-query";
 import { Loader } from "../components/Loader";
-import nodeFetch from "node-fetch";
 import { notion } from "../notion";
 
 // pages are also blocks
