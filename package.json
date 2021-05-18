@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@notionhq/client": "0.1.3",
-    "@zeit/next-css": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
